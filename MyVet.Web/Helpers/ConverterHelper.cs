@@ -33,10 +33,6 @@ namespace MyVet.Web.Helpers
                 Race = model.Race,
                 Remarks = model.Remarks
             };
-            if(model.Id !=0)
-            {
-                pet.Id = model.Id;
-            }
             return pet;
         }
 
