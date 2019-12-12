@@ -38,8 +38,10 @@
                         <li><a asp-area="" asp-controller="Owners" asp-action="Index">Propietarios</a></li>
                         <li><a asp-area="" asp-controller="Managers" asp-action="Index">Administrador</a></li>
                         <li><a asp-area="" asp-controller="Agenda" asp-action="Index">Agenda</a></li>
+                        <li><a asp-area="" asp-controller="PetTypes" asp-action="Index">Tipos de mascotas</a></li>
+                        <li><a asp-area="" asp-controller="ServiceTypes" asp-action="Index">Tipos de servicios</a></li>
                     }
-                    </ul>
+                </ul>
                 <ul class="nav navbar-nav navbar-right">
                     @if (User.Identity.IsAuthenticated)
                     {

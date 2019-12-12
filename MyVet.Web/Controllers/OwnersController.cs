@@ -3,25 +3,122 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyVet.Web.Data;
 using MyVet.Web.Data.Entities;
+using MyVet.Web.Helpers;
+using MyVet.Web.Models;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace MyVet.Web.Controllers
 {
-    [Authorize(Roles ="Admin")]
+    [Authorize(Roles = "Admin")]
     public class OwnersController : Controller
     {
         private readonly DataContext _context;
+        private readonly IUserHelper _userHelper;
+        private readonly ICombosHelper _combosHelper;
+        private readonly IImageHelper _imageHelper;
+        private readonly IConverterHelper _converterHelper;
 
-        public OwnersController(DataContext context)
+        public OwnersController(
+            DataContext context, 
+            IUserHelper userHelper,
+            ICombosHelper combosHelper,
+            IImageHelper imageHelper,
+            IConverterHelper converterHelper)
         {
             _context = context;
+            _userHelper = userHelper;
+            _combosHelper = combosHelper;
+            _imageHelper = imageHelper;
+            _converterHelper = converterHelper;
+        }
+        // POST: Owners/EditPet
+        [HttpPost]
+        public async Task<IActionResult> EditPet(PetViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var path = model.ImageUrl;
+
+                if (model.ImageFile != null)
+                {
+                    path = await _imageHelper.UploadImageAsync(model.ImageFile);
+                }
+                var pet = await _converterHelper.ToPetAsync(model, path, true);
+                _context.Pets.Update(pet);
+                await _context.SaveChangesAsync();
+                return RedirectToAction($"Details/{model.OwnerId}");
+            }
+            return View(model);
+        }
+            // GET: Owners/EditPet
+            public async Task<IActionResult> EditPet(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var pet = await _context.Pets
+                .Include(p => p.Owner)
+                .Include(p=>p.PetType)
+                .FirstOrDefaultAsync(p => p.Id == id);
+            if(pet == null)
+            {
+                return NotFound();
+            }
+            return View(_converterHelper.ToPetViewModel(pet));
+        }
+
+        // POST: Owners/CreatePet
+        [HttpPost]
+        public async Task<IActionResult> AddPet(PetViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var path = string.Empty;
+
+                if (model.ImageFile != null)
+                {
+                    path = await _imageHelper.UploadImageAsync(model.ImageFile);
+                }
+                var pet = await _converterHelper.ToPetAsync(model, path, true);
+                _context.Pets.Add(pet);
+                await _context.SaveChangesAsync();
+                return RedirectToAction($"Details/{model.OwnerId}");
+            }
+            return View(model);
+        }
+
+        // GET: Owners/CreatePet
+        public async Task<IActionResult> AddPet(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var owner = await _context.Owners.FindAsync(id.Value);
+            if (owner == null)
+            {
+                return NotFound();
+            }
+            var model = new PetViewModel
+            {
+                Born = DateTime.Today,
+                OwnerId = owner.Id,
+                PetTypes = _combosHelper.GetComboPetTypes()
+            };
+            return View(model);
         }
 
         // GET: Owners
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _context.Owners.ToListAsync());
+            return View(_context.Owners
+                .Include(o => o.User)
+                .Include(o => o.Pets));
         }
 
         // GET: Owners/Details/5
@@ -33,6 +130,11 @@ namespace MyVet.Web.Controllers
             }
 
             var owner = await _context.Owners
+                 .Include(o => o.User)
+                .Include(o => o.Pets)
+                .ThenInclude(p => p.PetType)
+                .Include(o => o.Pets)
+                .ThenInclude(p => p.Histories)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (owner == null)
             {
@@ -49,19 +151,51 @@ namespace MyVet.Web.Controllers
         }
 
         // POST: Owners/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id")] Owner owner)
+        public async Task<IActionResult> Create(AddUserViewModel model)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(owner);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                //crear usuario
+                var user = new User
+                {
+                    Address = model.Address,
+                    Document = model.Document,
+                    Email = model.Username,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    PhoneNumber = model.PhoneNumber,
+                    UserName = model.Username
+                };
+                var response = await _userHelper.AddUserAsync(user, model.Password);
+                if (response.Succeeded)
+                {
+                    var userInDB = await _userHelper.GetUserByEmailAsync(model.Username);
+                    await _userHelper.AddUserToRoleAsync(userInDB, "Customer");
+                    //crear owner
+                    var owner = new Owner
+                    {
+                        Agendas = new List<Agenda>(),
+                        Pets = new List<Pet>(),
+                        User = userInDB
+                    };
+                    //mandar bd
+                    _context.Owners.Add(owner);
+                    try
+                    {
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
+                    }
+                    catch (Exception ex)
+                    {
+                        ModelState.AddModelError(string.Empty, ex.ToString());
+                        return View(model);
+                    }
+                }
+                ModelState.AddModelError(string.Empty, response.Errors.FirstOrDefault().Description);
             }
-            return View(owner);
+            return View(model);
         }
 
         // GET: Owners/Edit/5

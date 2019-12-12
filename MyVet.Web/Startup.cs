@@ -41,14 +41,17 @@ namespace MyVet.Web
                 cfg.Password.RequireUppercase = false;
             }).AddEntityFrameworkStores<DataContext>();
 
-
             services.AddDbContext<DataContext>(cfg =>
             {
                 cfg.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
             services.AddTransient<SeedDb>();//addtransient solo lo inyecta una vez y addsingleton lo inyexta una vez pero lo deja permanente en todo el proyecto siempre se tiene objeto memoria
             //implementado ocn interface permite cambio tiempo ejecucion
-            services.AddScoped<IUserHelper, UserHelper>(); //se inyecta con addscopped todas las veces que se llame y crea nueva instancia
+            //se inyecta con addscopped todas las veces que se llame y crea nueva instancia
+            services.AddScoped<IUserHelper, UserHelper>(); 
+            services.AddScoped<ICombosHelper, CombosHelper>();
+            services.AddScoped<IImageHelper, ImageHelper>();
+            services.AddScoped<IConverterHelper, ConverterHelper>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
