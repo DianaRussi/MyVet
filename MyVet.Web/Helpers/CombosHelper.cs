@@ -31,5 +31,23 @@ namespace MyVet.Web.Helpers
             });
             return list;
         }
+
+        public IEnumerable<SelectListItem> GetComboServiceTypes()
+        {
+            var list = _dataContext.ServiceTypes.Select(st => new SelectListItem
+            {
+                Text = st.Name,
+                Value = $"{st.Id}"
+            })
+                .OrderBy(st => st.Text)
+                .ToList();
+
+            list.Insert(0, new SelectListItem
+            {
+                Text = "[Seleccione un tipo de servicio...]",
+                Value = "0"
+            });
+            return list;
+        }
     }
 }

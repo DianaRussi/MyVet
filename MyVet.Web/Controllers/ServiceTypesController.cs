@@ -122,21 +122,17 @@ namespace MyVet.Web.Controllers
             }
 
             var serviceType = await _context.ServiceTypes
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(st => st.Histories)
+                .FirstOrDefaultAsync(st => st.Id == id);
             if (serviceType == null)
             {
                 return NotFound();
             }
-
-            return View(serviceType);
-        }
-
-        // POST: ServiceTypes/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var serviceType = await _context.ServiceTypes.FindAsync(id);
+            if (serviceType.Histories.Count > 0)
+            {
+                ModelState.AddModelError(string.Empty, "El tipo de servicio no puede ser borrado.");
+                return RedirectToAction(nameof(Index));
+            }
             _context.ServiceTypes.Remove(serviceType);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
