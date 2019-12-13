@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using MyVet.Web.Data;
 using MyVet.Web.Data.Entities;
 using MyVet.Web.Helpers;
+using System.Text;
 
 namespace MyVet.Web
 {
@@ -45,6 +47,19 @@ namespace MyVet.Web
             {
                 cfg.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
+
+            services.AddAuthentication()
+                    .AddCookie()
+                    .AddJwtBearer(cfg =>
+                    {
+                        cfg.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidIssuer = Configuration["Tokens:Issuer"],
+                            ValidAudience = Configuration["Tokens:Audience"],
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Tokens:Key"]))
+                        };
+                    });
+
             services.AddTransient<SeedDb>();//addtransient solo lo inyecta una vez y addsingleton lo inyexta una vez pero lo deja permanente en todo el proyecto siempre se tiene objeto memoria
             //implementado ocn interface permite cambio tiempo ejecucion
             //se inyecta con addscopped todas las veces que se llame y crea nueva instancia
