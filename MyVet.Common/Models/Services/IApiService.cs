@@ -4,7 +4,7 @@ namespace MyVet.Common.Models.Services
 {
     public interface IApiService
     {
-        Task<Response> GetOwnerByEmailAsync( 
+        Task<Response<OwnerResponse>> GetOwnerByEmailAsync( 
             string urlBase,
             string servicePrefix,
             string controller,
@@ -12,10 +12,12 @@ namespace MyVet.Common.Models.Services
             string accessToken, // num largo que genera
             string email); 
 
-        Task<Response> GetTokenAsync( //se obtiene token con este metodo
+        Task<Response<TokenResponse>> GetTokenAsync( //se obtiene token con este metodo
             string urlBase, // url de publicacion 
             string servicePrefix, //ruteo del controlador
             string controller, // nombre controlador y la accion 
             TokenRequest request); // este ultimo combinacion d usuario y pasa
+
+        Task<bool> CheckConnection(string url);
     }
 }
