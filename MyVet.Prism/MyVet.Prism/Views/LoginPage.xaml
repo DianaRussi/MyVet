@@ -8,6 +8,9 @@
     <ScrollView>
         <StackLayout
         Padding="10">
+            <Image
+                HeightRequest="230"
+                Source="LogoVet"/>
             <Label
             Text="Email"/>
             <Entry
