@@ -9,5 +9,6 @@ namespace MyVet.Common.Models
         public string Description { get; set; }
         public DateTime Date { get; set; }
         public string Remarks { get; set; }
+        public DateTime DateLocal => Date.ToLocalTime();
     }
 }

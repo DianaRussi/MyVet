@@ -20,7 +20,7 @@ namespace MyVet.Prism.ViewModels
         {
             var parameters = new NavigationParameters();
             parameters.Add("pet", this);
-            await _navigationService.NavigateAsync("PetPage",parameters);
+            await _navigationService.NavigateAsync("HistoriesPage",parameters);
         }
     }
 }
