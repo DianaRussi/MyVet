@@ -25,6 +25,11 @@ namespace MyVet.Web.Controllers
             _configuration = configuration;
         }
 
+        public IActionResult NotAuthorized()
+        {
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateToken([FromBody] LoginViewModel model)
         {
