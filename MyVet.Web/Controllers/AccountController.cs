@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using MyVet.Web.Data;
@@ -21,15 +22,115 @@ namespace MyVet.Web.Controllers
         private readonly IUserHelper _userHelper;
         private readonly IConfiguration _configuration;
         private readonly DataContext _context;
+        private readonly IMailHelper _mailHelper;
 
         public AccountController(
             IUserHelper userHelper,
             IConfiguration configuration,
-            DataContext context)
+            DataContext context,
+            IMailHelper mailHelper)
         {
             _userHelper = userHelper;
             _configuration = configuration;
             _context = context;
+            _mailHelper = mailHelper;
+        }
+
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
+            {
+                return NotFound();
+            }
+
+            var user = await _userHelper.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var result = await _userHelper.ConfirmEmailAsync(user, token);
+            if (!result.Succeeded)
+            {
+                return NotFound();
+            }
+            return View();
+        }
+
+
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+                if (user != null)
+                {
+                    var result = await _userHelper.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+                    if (result.Succeeded)
+                    {
+                        return RedirectToAction("ChangeUser");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, result.Errors.FirstOrDefault().Description);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Usuario no encontrado.");
+                }
+            }
+            return View(model);
+        }
+
+        public async Task<IActionResult> ChangeUser()
+        {
+            var owner = await _context.Owners
+                .Include(o => o.User)
+                .FirstOrDefaultAsync(o => o.User.UserName.ToLower().Equals(User.Identity.Name.ToLower()));
+            if (owner == null)
+            {
+                return NotFound();
+            }
+
+            var view = new EditUserViewModel
+            {
+                Address = owner.User.Address,
+                Document = owner.User.Document,
+                FirstName = owner.User.FirstName,
+                Id = owner.Id,
+                LastName = owner.User.LastName,
+                PhoneNumber = owner.User.PhoneNumber
+            };
+            return View(view);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangeUser(EditUserViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var owner = await _context.Owners
+                    .Include(o => o.User)
+                    .FirstOrDefaultAsync(o => o.Id == model.Id);
+
+                owner.User.Document = model.Document;
+                owner.User.FirstName = model.FirstName;
+                owner.User.LastName = model.LastName;
+                owner.User.Address = model.Address;
+                owner.User.PhoneNumber = model.PhoneNumber;
+
+                await _userHelper.UpdateUserAsync(owner.User);
+                return RedirectToAction("Index", "Home");
+            }
+            return View(model);
         }
 
         public IActionResult Register()
@@ -46,7 +147,7 @@ namespace MyVet.Web.Controllers
                 var user = await AddUserAsync(model);
                 if (user == null)
                 {
-                    ModelState.AddModelError(string.Empty, "Correo ya existe.");
+                    ModelState.AddModelError(string.Empty, "This email is already used.");
                     return View(model);
                 }
 
@@ -59,21 +160,19 @@ namespace MyVet.Web.Controllers
                 _context.Owners.Add(owner);
                 await _context.SaveChangesAsync();
 
-                var loginViewModel = new LoginViewModel
+                var myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                var tokenLink = Url.Action("ConfirmEmail", "Account", new
                 {
-                    Password = model.Password,
-                    RememberMe = false,
-                    Username = model.Username
-                };
+                    userid = user.Id,
+                    token = myToken
+                }, protocol: HttpContext.Request.Scheme);
 
-                var result2 = await _userHelper.LoginAsync(loginViewModel);
-
-                if (result2.Succeeded)
-                {
-                    return RedirectToAction("Index", "Home");
-                }
+                _mailHelper.SendMail(model.Username, "Confirmación de email", $"<h1>Confirmación de email</h1>" +
+                    $"Para activar el usuario, " +
+                    $"por favor da clic en este link:</br></br><a href = \"{tokenLink}\">Confirmación de email</a>");
+                ViewBag.Message = "Las instrucciones para activar el usuario han sido enviadas a tu correo.";
+                return View(model);
             }
-
             return View(model);
         }
 
@@ -146,6 +245,7 @@ namespace MyVet.Web.Controllers
             }
             return BadRequest();
         }
+
 
         [HttpGet]
         public IActionResult Login()

@@ -20,19 +20,22 @@ namespace MyVet.Web.Controllers
         private readonly ICombosHelper _combosHelper;
         private readonly IImageHelper _imageHelper;
         private readonly IConverterHelper _converterHelper;
+        private readonly IMailHelper _mailHelper;
 
         public OwnersController(
-            DataContext context, 
+            DataContext context,
             IUserHelper userHelper,
             ICombosHelper combosHelper,
             IImageHelper imageHelper,
-            IConverterHelper converterHelper)
+            IConverterHelper converterHelper,
+            IMailHelper mailHelper)
         {
             _context = context;
             _userHelper = userHelper;
             _combosHelper = combosHelper;
             _imageHelper = imageHelper;
             _converterHelper = converterHelper;
+            _mailHelper = mailHelper;
         }
 
         // GET: Owners/DeletePet
@@ -329,6 +332,18 @@ namespace MyVet.Web.Controllers
                     try
                     {
                         await _context.SaveChangesAsync();
+
+                        var myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                        var tokenLink = Url.Action("ConfirmEmail", "Account", new
+                        {
+                            userid = user.Id,
+                            token = myToken
+                        }, protocol: HttpContext.Request.Scheme);
+
+                        _mailHelper.SendMail(model.Username, "Confirmación de email", $"<h1>Email Confirmation</h1>" +
+                             $"Para activar el usuario, " +
+                            $"por favor da clic en este link:</br></br><a href = \"{tokenLink}\">Confirmación de email</a>");
+
                         return RedirectToAction(nameof(Index));
                     }
                     catch (Exception ex)

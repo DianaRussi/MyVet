@@ -19,7 +19,7 @@
                 <span asp-validation-for="Username" class="text-danger"></span>
             </div>
 
-          <partial name="_User"/>
+            <partial name="_User" />
 
             <div class="form-group">
                 <label asp-for="Password" class="control-label"></label>
@@ -38,6 +38,12 @@
             </div>
         </form>
     </div>
+</div>
+
+<div class="text-success">
+    <p>
+        @ViewBag.Message
+    </p>
 </div>
 
 @section Scripts {
