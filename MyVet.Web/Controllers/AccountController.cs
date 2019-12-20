@@ -36,6 +36,64 @@ namespace MyVet.Web.Controllers
             _mailHelper = mailHelper;
         }
 
+        public IActionResult RecoverPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RecoverPassword(RecoverPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userHelper.GetUserByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "The email no corresponde al usuario registrado.");
+                    return View(model);
+                }
+
+                var myToken = await _userHelper.GeneratePasswordResetTokenAsync(user);
+                var link = Url.Action(
+                    "ResetPassword",
+                    "Account",
+                    new { token = myToken }, protocol: HttpContext.Request.Scheme);
+                _mailHelper.SendMail(model.Email, "Cambiar contraseña", $"<h1>Cambiar contraseña</h1>" +
+                    $"Para cambiar tu contraseña por favor da clic en este link:</br></br>" +
+                    $"<a href = \"{link}\">Reset Password</a>");
+                ViewBag.Message = "Las instrucciones para recuperar tu contraseña han sido enviadas a tu correo.";
+                return View();
+            }
+
+            return View(model);
+        }
+
+        public IActionResult ResetPassword(string token)
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            var user = await _userHelper.GetUserByEmailAsync(model.UserName);
+            if (user != null)
+            {
+                var result = await _userHelper.ResetPasswordAsync(user, model.Token, model.Password);
+                if (result.Succeeded)
+                {
+                    ViewBag.Message = "Contraseña cambiada satisfactoriamente.";
+                    return View();
+                }
+
+                ViewBag.Message = "Error al cambiar la contraseña.";
+                return View(model);
+            }
+
+            ViewBag.Message = "Usuario no encontrado.";
+            return View(model);
+        }
+
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {
             if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
@@ -167,9 +225,50 @@ namespace MyVet.Web.Controllers
                     token = myToken
                 }, protocol: HttpContext.Request.Scheme);
 
-                _mailHelper.SendMail(model.Username, "Confirmación de email", $"<h1>Confirmación de email</h1>" +
-                    $"Para activar el usuario, " +
-                    $"por favor da clic en este link:</br></br><a href = \"{tokenLink}\">Confirmación de email</a>");
+                _mailHelper.SendMail(model.Username, "Confirmación de email",
+                    $"<table style = 'max-width:600px; padding:10px; margin:0 auto; border-collapse:collapse;'>" +
+                    $"<tr>" +
+                    $"<td style='background-color:#34495e; text-align:center; padding:0'>" +
+                    $"<a href='https://www.facebook.com/NuskeCIV/'>" +
+                    $"<img width='20%' style='display:block; margin:1.5% 3%' src='https://veterinarianuske.com/wp-content/uploads/2016/10/line_separator.png'>" +
+                    $"</a>" +
+                    $"</td>" +
+                    $"</tr>" +
+                    $"<tr>" +
+                    $"<td style='padding:0'>" +
+                    $"<img style='padding:0; display:block' src='https://veterinarianuske.com/wp-content/uploads/2018/07/logo-nnske-blanck.jpg' width='100%'>" +
+                    $"</td>" +
+                    $"</tr>" +
+                    $"<td style='background-color:#ecf0f1'>" +
+                    $"<div style='color:#34495e; margin:4% 10% 2%; text-align:justify; font-family:sans-serif'>" +
+                    $"<h1 style='color:e67e22; margin:0 0 7px'>Hola</h1>" +
+                    $"<p style= 'margin:2px; font-size:15px'>" +
+                    $"Hospital veterinario de Medellin enfocado en brindar ciudados para su mascota<br>" +
+                    $"Entre los servicios que tenemos:</p>" +
+                    $"<ul style='font-size:15px; margin:10px 0'>" +
+                    $"<li> Urgencias</li>" +
+                    $"<li> Consultas</li>" +
+                    $"<li> Peluqueria</li>" +
+                    $"<li> Imagenologia</li>" +
+                    $"<li>Pruebas de laboratorio</li>" +
+                    $"<li> Guarderia canina</li>" +
+                    $"<li>Hotek canino y felino</li>" +
+                    $"</li>" +
+                    $"<div style='width:100%;margin:20px 0; display: inline-block; text-align:center'>" +
+                    $"<img style='padding:0; width:200px;margin:5px' src='https://veterinarianuske.com/wp-content/uploads/2018/07/tarjetas.png'>" +
+                    $"</div>" +
+                    $"<div style='width:100%;text-align:center'>" +
+                    $"<h2 style='color:#e67e22;margin:0 0 7px'>Confirmación email</h2>" +
+                    $"Para activar el usuario por favor da clic en este link:</br></br>" +
+                    $"<a style='text-decoration:none; border-radius:5px; padding:11px 23px; color:white; background-color:#3498db' href = \"{tokenLink}\">Confirmación de email</a>" +
+                    $"<p style='color:b3b3b3; font-size:12px; text-align:center; margin:30px 0 0'>Nuske Clinica Integral Veterinaria 2019</p>" +
+                    $"</div>" +
+                    $"</td>" +
+                    $"</tr>" +
+                    $"</table");
+                   // $"<h1>Confirmación de email</h1>" +
+                   //$"Para activar el usuario, " +
+                   // $"por favor da clic en este link:</br></br><a href = \"{tokenLink}\">Confirmación de email</a>");
                 ViewBag.Message = "Las instrucciones para activar el usuario han sido enviadas a tu correo.";
                 return View(model);
             }
