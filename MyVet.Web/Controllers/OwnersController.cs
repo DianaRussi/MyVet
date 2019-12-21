@@ -253,7 +253,7 @@ namespace MyVet.Web.Controllers
             }
             var model = new PetViewModel
             {
-                Born = DateTime.Today,
+                Born = DateTime.Now,
                 OwnerId = owner.Id,
                 PetTypes = _combosHelper.GetComboPetTypes()
             };

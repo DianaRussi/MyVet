@@ -22,9 +22,10 @@ namespace MyVet.Web.Data.Entities
 
         [Display(Name = "Fecha de nacimiento")]
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
-        [DataType(DataType.DateTime)]
-        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}")]
+        [DataType(DataType.Date)]
         public DateTime Born { get; set; }
+ 
         [Display(Name = "Comentarios")]
         public string Remarks { get; set; }
 
@@ -35,7 +36,7 @@ namespace MyVet.Web.Data.Entities
             : $"https://myvirtualweb.azurewebsites.net{ImageUrl.Substring(1)}";
 
         [Display(Name = "Fecha de nacimiento")]
-        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}")]
         public DateTime BornLocal => Born.ToLocalTime();
 
         public PetType PetType { get; set; }

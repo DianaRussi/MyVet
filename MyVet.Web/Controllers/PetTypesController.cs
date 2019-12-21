@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyVet.Web.Data;
 using MyVet.Web.Data.Entities;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace MyVet.Web.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class PetTypesController : Controller
     {
         private readonly DataContext _context;
@@ -77,11 +79,10 @@ namespace MyVet.Web.Controllers
         }
 
         // POST: PetTypes/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] PetType petType)
+        //public async Task<IActionResult> Edit(PetType petType)
         {
             if (id != petType.Id)
             {
