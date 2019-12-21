@@ -1,0 +1,30 @@
+﻿@model MyVet.Web.Models.AgendaViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Asignar</h2>
+
+<h4>Agenda</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Assing" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="OwnerId" />
+
+            <partial name="_Assing" />
+
+            <div class="form-group">
+                <input type="submit" value="Asignar" class="btn btn-primary" />
+                <a asp-action="MyAgenda" class="btn btn-success">Regresar a mi agenda</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
