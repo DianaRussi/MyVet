@@ -1,5 +1,7 @@
-﻿using MyVet.Common.Models;
+﻿using MyVet.Common.Helpers;
+using MyVet.Common.Models;
 using MyVet.Common.Models.Services;
+using Newtonsoft.Json;
 using Prism.Commands;
 using Prism.Navigation;
 
@@ -80,8 +82,7 @@ namespace MyVet.Prism.ViewModels
                 Password = Password,
                 Username = Email,
             };
-
-           
+          
             var response = await _apiService.GetTokenAsync(url, "/Account", "/CreateToken", request);
 
             if (!response.IsSuccess)
@@ -106,16 +107,14 @@ namespace MyVet.Prism.ViewModels
             }
 
             //descerialzar objeto usuario
-            var owner = response2.Result;
+            var owner =(OwnerResponse)response2.Result;
+            Settings.Owner = JsonConvert.SerializeObject(owner);
+            Settings.Token = JsonConvert.SerializeObject(token);
 
-            var parameters = new NavigationParameters
-            {
-                { "owner", owner }
-            };
             IsRunning = false;
             IsEnabled = true;
 
-            await _navigationService.NavigateAsync("PetsPage",parameters);
+            await _navigationService.NavigateAsync("PetsPage");
             Password = string.Empty;
         }
     }
