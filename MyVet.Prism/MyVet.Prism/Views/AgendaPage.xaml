@@ -6,11 +6,4 @@
              x:Class="MyVet.Prism.Views.AgendaPage"
              BackgroundColor="{StaticResource colorBackground}"
              Title="{Binding Title}">
-
-    <StackLayout
-    	HorizontalOptions="CenterAndExpand"
-    	VerticalOptions="CenterAndExpand">
-        <Label Text="{Binding Title}"/>
-    </StackLayout>
-
 </ContentPage>

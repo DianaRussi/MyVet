@@ -9,7 +9,7 @@
             <!-- Parameters -->
             <x:String x:Key="UrlAPI">https://myvirtualweb.azurewebsites.net</x:String>
 
-            <!-- Colors -->
+             <!--Colors--> 
             <Color x:Key="colorBackground">#F2F2F2</Color>
             <Color x:Key="colorPrimary">#0468BF</Color>
             <Color x:Key="colorSecondary">#067302</Color>
@@ -28,7 +28,7 @@
                 <Setter Property="TextColor" Value="{StaticResource colorFont}" />
             </Style>
             <Style x:Key="SecondaryButton" TargetType="Button">
-                <Setter Property="BackgroundColor" Value="{StaticResource ColorSecondary}" />
+                <Setter Property="BackgroundColor" Value="{StaticResource colorSecondary}" />
             </Style>
         </ResourceDictionary>
     </Application.Resources>

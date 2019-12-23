@@ -23,10 +23,12 @@ namespace MyVet.Prism.ViewModels
         {
             Title = "Ingresar";
             IsEnabled = true;
+            IsRemember = true;
             _navigationService = navigationService;
             _apiService = apiService;
-
         }
+
+        public bool IsRemember { get; set; }
         public string Email { get; set; }
 
         public string Password
@@ -117,10 +119,9 @@ namespace MyVet.Prism.ViewModels
             //await _navigationService.NavigateAsync("PetsPage");
             Password = string.Empty;
         }
-
         private async void Register()
         {
-            await _navigationService.NavigateAsync("RegisterPage");
+            await _navigationService.NavigateAsync("RegisterPage");//sin slash la pag de register se sobrepone a la de login
         }
     }
 }

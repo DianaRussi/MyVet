@@ -19,5 +19,11 @@ namespace MyVet.Common.Models.Services
             TokenRequest request); // este ultimo combinacion d usuario y pasa
 
         Task<bool> CheckConnection(string url);
+
+        Task<Response<object>> RegisterUserAsync(
+            string urlBase,
+            string servicePrefix,
+            string controller,
+            UserRequest userRequest);
     }
 }

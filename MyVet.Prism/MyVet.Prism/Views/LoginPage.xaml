@@ -14,7 +14,7 @@
             	        AbsoluteLayout.LayoutFlags="All"
                         Padding="10">
                     <Image
-                        HeightRequest="230"
+                        HeightRequest="180"
                         Source="LogoVet"/>
                     <Label
                         Text="Email"/>
@@ -29,6 +29,25 @@
                         Placeholder="Ingrese su contraseña..."
                         Text="{Binding Password}"/>
                 <StackLayout
+	HorizontalOptions="Center"
+	Orientation="Horizontal">
+                    <Label
+    	Text="Recordar en este dispositivo"
+                        VerticalOptions="Center"/>
+                    <CheckBox
+    	IsChecked="{Binding IsRemember}"/>
+                </StackLayout>
+                <Label
+	HorizontalOptions="Center"
+	Text="Olvido su contraseña?"
+	TextColor="{StaticResource colorAccent}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ForgotPasswordCommand}"/>
+                    </Label.GestureRecognizers>
+                </Label>
+
+                        
+                <StackLayout                 
                     Orientation="Horizontal"
                     VerticalOptions="EndAndExpand">
                     <Button
@@ -38,18 +57,18 @@
                     <Button
                         Command="{Binding RegisterCommand}"
                         IsEnabled="{Binding IsEnabled}"
-                        Style="{StaticResource ColorSecondary}"
+                        Style="{StaticResource SecondaryButton}"
                         Text="Regitrarse" />
                 </StackLayout>
                
             </StackLayout>
             <busyindicator:SfBusyIndicator  
+                    BackgroundColor="{StaticResource colorDanger}"
+	                TextColor="{StaticResource colorFontInverse}"
                 	AnimationType="DoubleCircle"
                 	AbsoluteLayout.LayoutBounds=".5,.5,.5,.5"
                 	AbsoluteLayout.LayoutFlags="All"
-                	BackgroundColor="{StaticResource colorDanger}"
                 	HorizontalOptions="Center"
-                	TextColor="{StaticResource colorFontInverse}"
                 	IsVisible="{Binding IsRunning}"
                 	Title="Cargando..."
                 	VerticalOptions="Center"
