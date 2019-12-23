@@ -4,7 +4,8 @@
             xmlns:prism="http://prismlibrary.com"
             xmlns:local="clr-namespace:MyVet.Prism.Views"
             prism:ViewModelLocator.AutowireViewModel="True"
-            x:Class="MyVet.Prism.Views.PetTabbedPage"
+            x:Class="MyVet.Prism.Views.PetTabbedPage"  
+            BackgroundColor="{StaticResource colorBackground}"
             Title="{Binding Title}">
     <TabbedPage.Children>
         <local:PetPage/>

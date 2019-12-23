@@ -5,6 +5,7 @@
              xmlns:busyindicator="clr-namespace:Syncfusion.SfBusyIndicator.XForms;assembly=Syncfusion.SfBusyIndicator.XForms"
              prism:ViewModelLocator.AutowireViewModel="True"
              x:Class="MyVet.Prism.Views.LoginPage"
+             BackgroundColor="{StaticResource colorBackground}"
              Title="{Binding Title}">
             <ScrollView>
                 <AbsoluteLayout>
@@ -27,23 +28,28 @@
                         IsPassword="True"
                         Placeholder="Ingrese su contraseña..."
                         Text="{Binding Password}"/>
-                <Button
-                        BackgroundColor="Navy"
-                        BorderRadius="23"
+                <StackLayout
+                    Orientation="Horizontal"
+                    VerticalOptions="EndAndExpand">
+                    <Button
                         Command="{Binding LoginCommand}"
                         IsEnabled="{Binding IsEnabled}"
-                        HeightRequest="46"
-                        Text="Ingresar"
-                        TextColor="White"
-                        VerticalOptions="EndAndExpand"/>
-                    </StackLayout>
+                        Text="Ingresar"/>
+                    <Button
+                        Command="{Binding RegisterCommand}"
+                        IsEnabled="{Binding IsEnabled}"
+                        Style="{StaticResource ColorSecondary}"
+                        Text="Regitrarse" />
+                </StackLayout>
+               
+            </StackLayout>
             <busyindicator:SfBusyIndicator  
                 	AnimationType="DoubleCircle"
                 	AbsoluteLayout.LayoutBounds=".5,.5,.5,.5"
                 	AbsoluteLayout.LayoutFlags="All"
-                	BackgroundColor="Silver"
+                	BackgroundColor="{StaticResource colorDanger}"
                 	HorizontalOptions="Center"
-                	TextColor="White"
+                	TextColor="{StaticResource colorFontInverse}"
                 	IsVisible="{Binding IsRunning}"
                 	Title="Cargando..."
                 	VerticalOptions="Center"
