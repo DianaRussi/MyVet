@@ -7,7 +7,7 @@
 
         <ResourceDictionary>
             <!-- Parameters -->
-            <x:String x:Key="UrlAPI">https://myvirtualweb.azurewebsites.net</x:String>
+            <x:String x:Key="UrlAPI">https://myvirtualvet.azurewebsites.net</x:String>
 
              <!--Colors--> 
             <Color x:Key="colorBackground">#F2F2F2</Color>

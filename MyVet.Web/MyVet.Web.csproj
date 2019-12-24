@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <UserSecretsId>37c26aa6-7cf0-466a-b765-bf44ddf48c96</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +15,8 @@
   <ItemGroup>
     <Compile Include="Migrations\20191211050201_allDB.cs" />
     <Compile Include="Migrations\20191211050201_allDB.designer.cs" />
+    <Compile Include="Migrations\20191224160808_AddLatAndLon.cs" />
+    <Compile Include="Migrations\20191224160808_AddLatAndLon.Designer.cs" />
     <Compile Include="Migrations\DataContextModelSnapshot.cs" />
   </ItemGroup>
 

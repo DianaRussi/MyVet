@@ -20,6 +20,12 @@ namespace MyVet.Web.Data.Entities
         [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
         [Display(Name = "Dirección")]
         public string Address { get; set; }
+        [Display(Name ="Latitud")]
+        [DisplayFormat(DataFormatString = "{0:N6}")]
+        public double Latitude { get; set; }
+        [DisplayFormat(DataFormatString = "{0:N6}")]
+        [Display(Name = "Longitud")]
+        public double Longitude { get; set; }
         [Display(Name = "Nombre completo")]
         public string FullNameWithDocument => $"{FirstName} {LastName} - {Document}";
         [Display(Name = "Nombre completo")]

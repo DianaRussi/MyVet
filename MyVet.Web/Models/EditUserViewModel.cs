@@ -28,5 +28,9 @@ namespace MyVet.Web.Models
         [Display(Name = "Teléfono")]
         [MaxLength(50, ErrorMessage = "El {0} puede tener máximo {1} caracteres.")]
         public string PhoneNumber { get; set; }
+        [Display(Name = "Latitud")]
+        public double Latitude { get; set; }
+        [Display(Name = "Longitud")]
+        public double Longitude { get; set; }
     }
 }
