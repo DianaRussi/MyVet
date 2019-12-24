@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="http://prismlibrary.com"
+             xmlns:busyindicator="clr-namespace:Syncfusion.SfBusyIndicator.XForms;assembly=Syncfusion.SfBusyIndicator.XForms"
+             xmlns:ffimageloading="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
+             prism:ViewModelLocator.AutowireViewModel="True"
+             x:Class="MyVet.Prism.Views.EditPage"
+             BackgroundColor="{StaticResource colorBackground}"
+             Title="{Binding Title}">
+    <StackLayout    
+        Padding="10">
+        <ScrollView>
+            <AbsoluteLayout>
+                <StackLayout
+                AbsoluteLayout.LayoutBounds="0,0,1,1"
+            	AbsoluteLayout.LayoutFlags="All">
+
+                    <ffimageloading:CachedImage 
+                        Aspect="AspectFit"
+                        Source="{Binding ImageSource}"
+                        LoadingPlaceholder="LoaderImage"
+                        ErrorPlaceholder="ErrorImage"
+                        CacheDuration="50"
+                        RetryCount="3"
+                        RetryDelay="600"
+                        DownsampleToViewSize="True">
+                        <ffimageloading:CachedImage.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ChangeImageCommand}"/>
+                        </ffimageloading:CachedImage.GestureRecognizers>
+                    </ffimageloading:CachedImage>
+
+                    <Label
+            	FontSize="Micro"
+            	HorizontalOptions="Center"
+            	Text="Cambiar imagen"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Label
+                	Grid.Column="0"
+                	Grid.Row="0"
+                	Text="Nombre"
+                	VerticalOptions="Center"/>
+                        <Entry
+                	Grid.Column="1"
+                	Grid.Row="0"
+                	Placeholder="Ingrese nombre de la mascota"
+                	Text="{Binding Pet.Name}"/>
+
+                        <Label
+                	Grid.Column="0"
+                	Grid.Row="1"
+                	Text="Raza"
+                	VerticalOptions="Center"/>
+                        <Entry
+                	Grid.Column="1"
+                	Grid.Row="1"
+                	Placeholder="Ingrese raza de la mascota"
+                	Text="{Binding Pet.Race}"/>
+
+                        <Label
+                	Grid.Column="0"
+                	Grid.Row="2"
+                	Text="Tipo de mascota"
+                	VerticalOptions="Center"/>
+
+                        <Picker
+                	Grid.Column="1"
+                	Grid.Row="2"
+                	ItemDisplayBinding="{Binding Name}"
+                	ItemsSource="{Binding PetTypes}"
+                	SelectedItem="{Binding PetType}"
+                	Title="Seleccione tipo de mascota"/>
+
+                        <Label
+                	Grid.Column="0"
+                	Grid.Row="3"
+                	Text="Fecha de nacimiento"
+                	VerticalOptions="Center"/>
+
+                        <DatePicker
+                	Grid.Column="1"
+                	Grid.Row="3"
+                	Date="{Binding Pet.Born}"/>
+
+                        <Label
+                	Grid.Column="0"
+                	Grid.Row="4"
+                	Text="Comentarios"
+                	VerticalOptions="Center"/>
+
+                        <Editor
+                	Grid.Column="1"
+                	Grid.Row="4"
+                	HeightRequest="80"
+                	Text="{Binding Pet.Remarks}"/>
+                    </Grid>
+
+                </StackLayout>
+
+                <busyindicator:SfBusyIndicator  
+                    BackgroundColor="{StaticResource colorDanger}"
+	                TextColor="{StaticResource colorFontInverse}"
+                	AnimationType="DoubleCircle"
+                	AbsoluteLayout.LayoutBounds=".5,.5,.5,.5"
+                	AbsoluteLayout.LayoutFlags="All"
+                	HorizontalOptions="Center"
+                	IsVisible="{Binding IsRunning}"
+                	Title="Guardando..."
+                	VerticalOptions="Center"
+                	ViewBoxWidth="80"
+                	ViewBoxHeight="80" />
+            </AbsoluteLayout>
+        </ScrollView>
+        <StackLayout
+            	    Orientation="Horizontal"
+                    VerticalOptions="EndAndExpand">
+
+            <Button
+                	Command="{Binding SaveCommand}"
+                	IsEnabled="{Binding IsEnabled}"
+                	Text="Guardar"/>
+
+            <Button
+                	Command="{Binding DeleteCommand}"
+                	IsEnabled="{Binding IsEnabled}"
+                	IsVisible="{Binding IsEdit}"
+                	Style="{StaticResource DangerButton}"
+                	Text="Borrar"/>
+        </StackLayout>
+    </StackLayout>
+</ContentPage>
