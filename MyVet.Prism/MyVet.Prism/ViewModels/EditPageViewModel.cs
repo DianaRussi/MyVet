@@ -2,6 +2,9 @@
 using MyVet.Common.Models;
 using MyVet.Common.Models.Services;
 using Newtonsoft.Json;
+using Plugin.Media;
+using Plugin.Media.Abstractions;
+using Prism.Commands;
 using Prism.Navigation;
 using System;
 using System.Collections.Generic;
@@ -24,6 +27,9 @@ namespace MyVet.Prism.ViewModels
         private bool _isRunning;
         private bool _isEnabled;
         private bool _isEdit;
+        private MediaFile _file; //donde se captura la imagen
+        private DelegateCommand _changeImageCommand; // toco la imagen activa para cambiarla
+
         public EditPageViewModel(
             INavigationService navigationService,
             IApiService apiService) : base(navigationService)
@@ -32,6 +38,8 @@ namespace MyVet.Prism.ViewModels
             _navigationService = navigationService;
             _apiService = apiService;
         }
+
+        public DelegateCommand ChangeImageCommand => _changeImageCommand ?? (_changeImageCommand = new DelegateCommand(ChangeImageAsync));
 
         public ObservableCollection<PetTypeResponse> PetTypes //lista
         {
@@ -94,6 +102,49 @@ namespace MyVet.Prism.ViewModels
                 Title = "Nueva Mascota";
             }
             LoadPetTypesAsync();
+        }
+
+        private async void ChangeImageAsync()
+        {
+            await CrossMedia.Current.Initialize();
+
+            var source = await Application.Current.MainPage.DisplayActionSheet(
+                "De donde quieres obtener la foto?",
+                "Cancelar",
+                null,
+                "Desde galeria",
+                "Desde camara");
+
+            if (source == "Cancelar")
+            {
+                _file = null;
+                return;
+            }
+
+            if (source == "Desde camara")
+            {
+                _file = await CrossMedia.Current.TakePhotoAsync(
+                    new StoreCameraMediaOptions
+                    {
+                        Directory = "Sample",
+                        Name = "test.jpg",
+                        PhotoSize = PhotoSize.Small,
+                    }
+                );
+            }
+            else
+            {
+                _file = await CrossMedia.Current.PickPhotoAsync();
+            }
+
+            if (_file != null)
+            {
+                this.ImageSource = ImageSource.FromStream(() =>
+                {
+                    var stream = _file.GetStream();
+                    return stream;
+                });
+            }
         }
 
         private async void LoadPetTypesAsync()
